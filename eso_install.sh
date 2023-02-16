@@ -16,7 +16,7 @@ echo "Creating required Environment Variables."
 echo "===================================================="
 
 declare AWS_REGION="eu-west-1"
-declare EKS_CLUSTER_NAME="eso-demo"
+declare EKS_CLUSTER_NAME="eso-cftc"
 declare NAMESPACE="default"
 
 install_eso(){

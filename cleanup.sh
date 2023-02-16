@@ -6,7 +6,7 @@ this repository gracefully.
 '
 
 declare AWS_REGION="eu-west-1"
-declare EKS_CLUSTER_NAME="eso-demo"
+declare EKS_CLUSTER_NAME="eso-cftc"
 declare ESO_SYSTEM_NAMESPACE="external-secrets"
 
 cleanup_eso(){
@@ -15,7 +15,7 @@ cleanup_eso(){
   echo "Creating required Environment Variables."
   echo "===================================================="
 
-  declare ACCOUNT_ID=$(aws sts get-caller-identity --output text --query 'Account')
+  declare ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text)
   declare OIDCURL=$(aws eks describe-cluster --name ${EKS_CLUSTER_NAME} --region ${AWS_REGION} --query "cluster.identity.oidc.issuer" --output text | sed -r 's/https:\/\///')
 
   echo "===================================================="
@@ -29,7 +29,7 @@ cleanup_eso(){
   echo "====================================================" 
 
   ESO_IAM_POLICY="eso_secrets_manager_policy"
-  POLICY_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${ESO_IAM_POLICY}"
+  POLICY_ARN="arn:aws:iam::${ACCOUNT_ID}:policy/${ESO_IAM_POLICY}"
   ESO_IAM_ROLE="eso-iam-role"
 
   aws iam detach-role-policy --policy-arn ${POLICY_ARN} --role-name eso-iam-role
@@ -41,7 +41,7 @@ cleanup_eso(){
   echo "====================================================" 
 
   ESO_K8S_SERVICE_ACCOUNT_NAME="eso-sa"
-  kubectl delete sa ${ESO_K8S_SERVICE_ACCOUNT_NAME} -n ${ESO_SYSTEM_NAMESPACE}
+  kubectl delete sa ${ESO_K8S_SERVICE_ACCOUNT_NAME}
 
   echo "===================================================="
   echo "Deleting the Kubernetes Namespace."

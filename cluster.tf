@@ -55,7 +55,7 @@ module "eks_cluster" {
 }
 
 data "aws_eks_addon_version" "latest" {
-  for_each = toset(["vpc-cni", "coredns"])
+  for_each = toset(["vpc-cni"])
 
   addon_name         = each.value
   kubernetes_version = module.eks_cluster.eks_cluster_version
@@ -80,7 +80,6 @@ module "eks_kubernetes_addons" {
   eks_oidc_provider            = module.eks_cluster.oidc_provider
   eks_worker_security_group_id = module.eks_cluster.worker_node_security_group_id
   auto_scaling_group_names     = module.eks_cluster.self_managed_node_group_autoscaling_groups
-  enable_tetrate_istio         = false
 
   # EKS Addons
   enable_amazon_eks_vpc_cni = true
@@ -89,19 +88,11 @@ module "eks_kubernetes_addons" {
     resolve_conflicts = "OVERWRITE"
   }
 
-  enable_amazon_eks_coredns = true
-  amazon_eks_coredns_config = {
-    addon_version     = data.aws_eks_addon_version.latest["coredns"].version
-    resolve_conflicts = "OVERWRITE"
-  }
-
   enable_amazon_eks_kube_proxy = true
   amazon_eks_kube_proxy_config = {
     addon_version     = data.aws_eks_addon_version.default["kube-proxy"].version
     resolve_conflicts = "OVERWRITE"
   }
-
-  enable_amazon_eks_aws_ebs_csi_driver  = true
 
   tags = {
       Name = var.cluster_name
